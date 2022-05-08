@@ -1,59 +1,30 @@
 import React, {useState, useEffect, useRef} from 'react'
 
-import {CanvasManager} from './utils/notebookUtil'
+import {NotebookEngine, NotebookState, MODE} from './utils/notebookUtil'
 
-// controls the mode for reading/writing
-const MODE = {
-    WRITE:0,
-    DRAW:1
-}
+import './styles/Notebook.css'
 
 function Notebook() {
     // tracks the current mode used in the notebook 
-    const [mode, setMode] = useState(MODE.WRITE)
+    const [mode, setMode] = useState(MODE.DRAW)
     // tracks the state of the notebook
-    const [nbookState, setnBookState] = useState({
-        style:{
-            color: 'black'
-        },
-        text:{
-            content:''
-        },
-        drawing:{
-            content:[]
-        }
-    })
-    // styles
-    const containerStyle = {
-        display: 'flex',
-        position: 'relative',
-        width: '100wh',
-        height: '100vh',
-        top:0,
-        left:0
-    }
+    const [nbookState, setnBookState] = useState(new NotebookState())
+    // canvas reference pointer
+    const canvasRef = useRef(null);
+    // auto-adjust the size of the canvas (this should load and reload the state to perserve)
+    useEffect(()=>{
+        NotebookEngine.autoAdjustCanvasSize(canvasRef)
+    },[])
 
-    const textAreaStyle = {
-        backgroundColor: 'rgba(255,255,255,0.1)',
-         width: '100%',
-          height: '100vh',
-           zIndex:`${mode}`,
-            position:'absolute'}
-
-    const canvasStyle = {
-            top:0,
-            left:0,
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            zIndex:`${!mode}`,
-            position:'absolute',
-            width:'100%',
-            height: '100vh'
-        }
   return (
-    <div style={containerStyle}>
-        <canvas style={textAreaStyle}></canvas>
-        <textarea type="text" name="" id="" style={canvasStyle} 
-            onKeyDown={(ev)=>{CanvasManager._handleKeyDownEvent(ev, nbookState, setnBookState)}}></textarea>
+    <div  className="nb__container">
+        <canvas width="2000" height="2000" ref={canvasRef} style={{zIndex:`${mode}`}} className="nb__canvas"
+            onPointerDown={(e)=>NotebookEngine._handlePointerDownOnCanvas(e, canvasRef)}
+            onPointerMove={(e)=>NotebookEngine._handlePointerMoveOnCanvas(e, canvasRef,  nbookState, setnBookState)}
+            onPointerUp={()=>NotebookEngine._handlePointerUpOnCanvas()}></canvas>
+
+        <textarea className="nb__textarea" type="text" name="" id="" style={{zIndex:`${!mode}`}} 
+            onKeyUp={(ev)=>{NotebookEngine._handleKeyDownEvent(ev, nbookState, setnBookState)}}></textarea>
     </div>
   )
 }
