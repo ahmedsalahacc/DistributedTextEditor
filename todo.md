@@ -8,3 +8,4 @@
 * Empty the state as soon as it is transmitted and have a reciever state that gets everything and draws it on screen then it is emptied
 * On delete, get the crt state and store the state after the delete then send it to the server and then delete the current state (HOW CAN IT BE IMPROVED??)
 * On insert, only send the new lines added to the state
+* Handles should be public with no underscore at the beginning
