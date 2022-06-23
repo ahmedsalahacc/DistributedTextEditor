@@ -20,18 +20,18 @@ function Home() {
           <title>Home</title>
         </head>
         <body>
-          <div>
             <div class="topnav">
               <a href="/About">About Us</a>
             </div>
-            <div>
-              <h1>Welcome To Our Multi-Editor Software</h1>
+            <div id="ovr">
+            <div >
+              <h1>Edit Shared Documents with Your Teammates</h1>
             </div>
             <div class="formdiv">
               <form>
-                <label>Enter Notebook ID</label>
-                <input type="number" id="notebookID"></input>
-                <input type="submit" value="Head To Notebook" onClick={goToNotebook}></input>
+                <label>Notebook ID </label>
+                <input type="text" min="1" id="notebookID"></input>
+                <button type="submit" onClick={goToNotebook}>Open</button>
               </form>
             </div>
           </div>
