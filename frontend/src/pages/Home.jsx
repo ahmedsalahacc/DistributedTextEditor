@@ -1,18 +1,17 @@
 import React from 'react';
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Notebook from './Notebook';
 import './styles/Home.css'; 
-//const navigate = useNavigate();
 
 function Home() {
 
-  function goToNotebook(){
-      
-    //   const routeChange = () =>{ 
-    //   let path = `newPath`; 
-    //   navigate(path);
-    // }
-    alert("Edit Me");
+  const navigate = useNavigate();
+  function goToNotebook()
+  {
+    let notebookID = document.getElementById("notebookID").value;
+    console.log(notebookID);
+    let path = `/notebook`; 
+    navigate(path);
   }
 
   return (

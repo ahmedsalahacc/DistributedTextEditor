@@ -1,5 +1,5 @@
 // import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Notebook from "./pages/Notebook";
@@ -14,6 +14,8 @@ function App() {
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/about" element={<About />} />
           <Route exact path="/notebook" element={<Notebook />} />
+          <Route path="/redirect" element={ <Navigate to="/error" /> } />
+          <Route path="/notebook" element={ <Navigate to="/notebook" /> } />
         </Routes>
       </BrowserRouter>
     </div>
