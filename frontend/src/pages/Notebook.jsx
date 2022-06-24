@@ -20,6 +20,7 @@ function Notebook() {
         NotebookEngine.autoAdjustCanvasSize(canvasRef)
     },[])
     sync.requestContent(setnBookState, canvasRef, textAreaRef)
+    sync.startSync(nbookState, setnBookState, canvasRef,textAreaRef)
 
   return (
     <div  className="nb__container">
@@ -32,6 +33,7 @@ function Notebook() {
             onKeyUp={(ev)=>{NotebookEngine._handleKeyDownEvent(ev, nbookState, setnBookState)}}></textarea>
     </div>
   )
+
 }
 
 

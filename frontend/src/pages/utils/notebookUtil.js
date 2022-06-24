@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import io from "socket.io-client";
+import { INTERVAL } from "./consts";
 
 /**
  * # Class: Notebook Engine
@@ -74,7 +75,7 @@ export class NotebookEngine {
       );
 
       stateUpdater(newState);
-      console.log(state);
+      // console.log(state);
     }
   }
 
@@ -108,7 +109,7 @@ export class NotebookEngine {
     );
 
     stateUpdater(newState);
-    console.log(state);
+    // console.log(state);
   }
 
   /**
@@ -142,7 +143,7 @@ export class NotebookEngine {
   }
 
   static _writeOnNotebook(state, canvasRef, textareaRef) {
-    canvasRef.current.textContent = state.getTextStateObject().content;
+    textareaRef.current.textContent = state.getTextStateObject().content;
 
     //@TODO drawing
   }
@@ -232,11 +233,12 @@ export class NotebookState {
   }
 
   setNotebookContentStateObject(newState, canvasRef, textAreaRef) {
+    console.log(newState);
     this.drawing.content = newState.drawing;
     this.text.content = newState.text;
 
     // update the notebook on screen
-    NotebookEngine._writeOnNotebook(newState, canvasRef, textAreaRef);
+    NotebookEngine._writeOnNotebook(this, canvasRef, textAreaRef);
   }
 }
 
@@ -253,6 +255,7 @@ export class Synchronizer {
 
   requestContent(setState, canvasRef, textareaRef, notebookId = 1) {
     useEffect(() => {
+      console.log("fetching backend content");
       const controller = new AbortController();
       const signal = controller.signal;
       fetch(this.httpServer + `/notebook/content/${notebookId}`, {
@@ -262,17 +265,22 @@ export class Synchronizer {
         .then((data) => {
           data = JSON.parse(data.data);
           const state = new NotebookState();
-          state.setNotebookContentStateObject(state, canvasRef, textareaRef);
+          state.setNotebookContentStateObject(data, canvasRef, textareaRef);
           setState(state);
         });
+
+      return () => {
+        controller.abort();
+      };
     }, [canvasRef, textareaRef]);
   }
+
   startSync(state, setState, canvasRef, textAreaRef) {
     useEffect(() => {
-      this.socket.current.on("connect", () => {
+      this.socket.on("connect", () => {
         console.log("connected to server");
       });
-      this.socket.current.on("disconnect", () => {
+      this.socket.on("disconnect", () => {
         console.log("disconnected from server");
       });
 
@@ -280,13 +288,15 @@ export class Synchronizer {
       function update() {
         return state;
       }
-      setTimeout(() => {
+      setInterval(() => {
+        console.log(update().getNotebookContentStateObject());
         this.socket.emit(
           "nbookstate",
           JSON.stringify(update().getNotebookContentStateObject())
         );
+
         setState(update());
-      });
+      }, INTERVAL);
     }, []);
   }
 }
