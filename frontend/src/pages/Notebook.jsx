@@ -7,7 +7,7 @@ import './styles/Notebook.css'
 
 function Notebook() {
     // tracks the current mode used in the notebook 
-    const [mode, setMode] = useState(MODE.DRAW)
+    const [mode, setMode] = useState(MODE.WRITE)
     // tracks the state of the notebook
     const [nbookState, setnBookState] = useState(new NotebookState())
     // canvas reference pointer
