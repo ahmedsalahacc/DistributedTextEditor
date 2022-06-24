@@ -1,10 +1,5 @@
-import React from "react";
-
-// controls the mode for reading/writing
-export const MODE = {
-  WRITE: 0,
-  DRAW: 1,
-};
+import React, { useEffect } from "react";
+import io from "socket.io-client";
 
 /**
  * # Class: Notebook Engine
@@ -145,6 +140,12 @@ export class NotebookEngine {
       y: y,
     };
   }
+
+  static _writeOnNotebook(state, canvasRef, textareaRef) {
+    canvasRef.current.textContent = state.getTextStateObject().content;
+
+    //@TODO drawing
+  }
 }
 
 //***********************************************************************************
@@ -221,5 +222,71 @@ export class NotebookState {
    */
   getDrawingStateObject() {
     return this.drawing;
+  }
+
+  getNotebookContentStateObject() {
+    return {
+      drawing: this.getDrawingStateObject().content,
+      text: this.getTextStateObject().content,
+    };
+  }
+
+  setNotebookContentStateObject(newState, canvasRef, textAreaRef) {
+    this.drawing.content = newState.drawing;
+    this.text.content = newState.text;
+
+    // update the notebook on screen
+    NotebookEngine._writeOnNotebook(newState, canvasRef, textAreaRef);
+  }
+}
+
+export class Synchronizer {
+  constructor(SOCKET_Server, HTTP_Server) {
+    this.socketServer = SOCKET_Server;
+    this.httpServer = HTTP_Server;
+    this.socket = this.__connect();
+  }
+
+  __connect() {
+    return io(this.socketServer);
+  }
+
+  requestContent(setState, canvasRef, textareaRef, notebookId = 1) {
+    useEffect(() => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      fetch(this.httpServer + `/notebook/content/${notebookId}`, {
+        signal,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          data = JSON.parse(data.data);
+          const state = new NotebookState();
+          state.setNotebookContentStateObject(state, canvasRef, textareaRef);
+          setState(state);
+        });
+    }, [canvasRef, textareaRef]);
+  }
+  startSync(state, setState, canvasRef, textAreaRef) {
+    useEffect(() => {
+      this.socket.current.on("connect", () => {
+        console.log("connected to server");
+      });
+      this.socket.current.on("disconnect", () => {
+        console.log("disconnected from server");
+      });
+
+      // sync handler
+      function update() {
+        return state;
+      }
+      setTimeout(() => {
+        this.socket.emit(
+          "nbookstate",
+          JSON.stringify(update().getNotebookContentStateObject())
+        );
+        setState(update());
+      });
+    }, []);
   }
 }
