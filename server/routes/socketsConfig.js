@@ -40,9 +40,9 @@ exports.connection = (io) => {
     setInterval(() => {
       let holder = { data: "" };
       fileworker.readFile("./files/file_1.json", (data) => {
-        socket.emit("nbookstate-response", data);
+        socket.broadcast.emit("nbookstate-response", data);
       });
-    }, 1000);
+    }, 200);
   });
 
   io.emit("received");

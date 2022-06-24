@@ -256,10 +256,14 @@ export class Synchronizer {
   requestContent(setState, canvasRef, textareaRef, notebookId = 1) {
     useEffect(() => {
       console.log("fetching backend content");
+
+      // signal controller for cleanup
       const controller = new AbortController();
       const signal = controller.signal;
+
+      // fetching API
       fetch(this.httpServer + `/notebook/content/${notebookId}`, {
-        signal,
+        signal: signal,
       })
         .then((res) => res.json())
         .then((data) => {
@@ -269,6 +273,7 @@ export class Synchronizer {
           setState(state);
         });
 
+      // cleanup
       return () => {
         controller.abort();
       };
@@ -277,14 +282,17 @@ export class Synchronizer {
 
   startSync(state, setState, canvasRef, textAreaRef) {
     useEffect(() => {
+      // on connection handler
       this.socket.on("connect", () => {
         console.log("connected to server");
       });
+
+      // on disconnection handler
       this.socket.on("disconnect", () => {
         console.log("disconnected from server");
       });
 
-      // sync handler
+      // State sync: notebook state emiter
       function update() {
         return state;
       }
@@ -297,6 +305,20 @@ export class Synchronizer {
 
         setState(update());
       }, INTERVAL);
+
+      // on nbookstate-response handler
+      this.socket.on("nbookstate-response", (data) => {
+        data = JSON.parse(data);
+        console.log(data);
+        const nbookstate = new NotebookState();
+        nbookstate.setNotebookContentStateObject(data, canvasRef, textAreaRef);
+        console.log(state);
+      });
+
+      // clean up
+      return () => {
+        this.socket.disconnect();
+      };
     }, []);
   }
 }
