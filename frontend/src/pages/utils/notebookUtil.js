@@ -15,10 +15,12 @@ export class NotebookEngine {
    * @param {React.Ref} canvasRef - reference of the canvas
    */
   static autoAdjustCanvasSize(canvasRef) {
-    let canvas = canvasRef.current;
-    if (canvas === null) return;
-    canvas.width = document.body.clientWidth; //document.width is obsolete
-    canvas.height = document.body.clientHeight; //document.height is obsolete
+    useEffect(() => {
+      let canvas = canvasRef.current;
+      if (canvas === null) return;
+      canvas.width = document.body.clientWidth; //document.width is obsolete
+      canvas.height = document.body.clientHeight; //document.height is obsolete
+    }, []);
   }
 
   /**
@@ -233,7 +235,6 @@ export class NotebookState {
   }
 
   setNotebookContentStateObject(newState, canvasRef, textAreaRef) {
-    console.log(newState);
     this.drawing.content = newState.drawing;
     this.text.content = newState.text;
 
@@ -282,6 +283,7 @@ export class Synchronizer {
 
   startSync(state, setState, canvasRef, textAreaRef) {
     useEffect(() => {
+      if (this.socket == null) return;
       // on connection handler
       this.socket.on("connect", () => {
         console.log("connected to server");
@@ -297,7 +299,6 @@ export class Synchronizer {
         return state;
       }
       setInterval(() => {
-        console.log(update().getNotebookContentStateObject());
         this.socket.emit(
           "nbookstate",
           JSON.stringify(update().getNotebookContentStateObject())
@@ -308,17 +309,12 @@ export class Synchronizer {
 
       // on nbookstate-response handler
       this.socket.on("nbookstate-response", (data) => {
+        console.log("receiving response", data);
         data = JSON.parse(data);
-        console.log(data);
         const nbookstate = new NotebookState();
         nbookstate.setNotebookContentStateObject(data, canvasRef, textAreaRef);
-        console.log(state);
+        setState(nbookstate);
       });
-
-      // clean up
-      return () => {
-        this.socket.disconnect();
-      };
     }, []);
   }
 }

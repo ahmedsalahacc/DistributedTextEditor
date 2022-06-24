@@ -38,11 +38,10 @@ exports.connection = (io) => {
 
     // send from the notebook
     setInterval(() => {
-      let holder = { data: "" };
       fileworker.readFile("./files/file_1.json", (data) => {
-        socket.broadcast.emit("nbookstate-response", data);
+        socket.emit("nbookstate-response", data);
       });
-    }, 200);
+    }, 2000);
   });
 
   io.emit("received");

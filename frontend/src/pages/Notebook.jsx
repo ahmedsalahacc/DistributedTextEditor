@@ -16,9 +16,7 @@ function Notebook() {
     // init state sync
     const sync = new Synchronizer(SOCKET_SERVER, HTTP_SERVER) 
     // auto-adjust the size of the canvas (this should load and reload the state to perserve)
-    useEffect(()=>{
-        NotebookEngine.autoAdjustCanvasSize(canvasRef)
-    },[])
+    NotebookEngine.autoAdjustCanvasSize(canvasRef)
     sync.requestContent(setnBookState, canvasRef, textAreaRef)
     sync.startSync(nbookState, setnBookState, canvasRef,textAreaRef)
 
