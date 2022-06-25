@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import Notebook from './Notebook';
-import './styles/Home.css'; 
+
+// import '../styles/Home.css'; 
+import '../styles/Home.css'
 
 function Home() {
 
@@ -9,19 +11,15 @@ function Home() {
   function goToNotebook()
   {
     let notebookID = document.getElementById("notebookID").value;
-    console.log(notebookID);
-    let path = `/notebook`; 
+    // console.log(notebookID);
+    let path = `/docs/${notebookID}`; 
     navigate(path);
   }
 
   return (
-    <html>
-        <head>
-          <title>Home</title>
-        </head>
-        <body>
+        <div>
             <div class="topnav">
-              <a href="/About">About Us</a>
+              <a href="/about">About Us</a>
             </div>
             <div id="ovr">
             <div >
@@ -35,8 +33,7 @@ function Home() {
               </form>
             </div>
           </div>
-        </body>
-    </html>
+        </div>
   )
 }
 

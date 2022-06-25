@@ -1,14 +1,14 @@
 import React from "react";
-import "./styles/About.css";
+import "../styles/About.css";
 
 function About() {
   return (
-    <html>
-      <head>
-        <title>About</title>
-      </head>
-      <body>
+    <div>
+        <div class="topnav">
+              <a href="/">Home</a>
+            </div>
         <div>
+            <div class="container">
           <h1>About Us</h1>
           <div>
             <p>
@@ -25,7 +25,7 @@ function About() {
             <h3>Website Developers</h3>
             <table>
               <tr>
-                <td>Ahmed Salah Eldin</td>
+                <td>Ahmed Salah A.Maksoud</td>
                 <td class="shft">
                   <a href="mailto:18P9076@eng.asu.edu.eg">18P9076@eng.asu.edu.eg</a>
                 </td>
@@ -68,15 +68,15 @@ function About() {
             
             <br></br>
             <span>
-              <i>&copy; copyrights, Ain Shams University</i>
+              <i>&copy; copyrights, Faculty of Engineering Ain Shams University</i>
             </span><br></br>
             <span>
               <i>Special Thanks For Prof. Ayman Bahaa &amp; Eng. Mostafa for their support.</i>
             </span>
           </div>
         </div>
-      </body>
-    </html>
+        </div>
+      </div>
   );
 }
 
