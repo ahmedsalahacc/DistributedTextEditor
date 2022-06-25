@@ -8,7 +8,7 @@ import "../styles.css/editor.css";
 
 const TOOLBAR_OPTIONS = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  [{ font: ["consolas"] }],
+  [{ font: [] }],
   [{ list: "ordered" }, { list: "bullet" }],
   ["bold", "italic", "underline", "strike"],
   [{ color: [] }, { background: [] }],
@@ -18,10 +18,14 @@ const TOOLBAR_OPTIONS = [
   ["clean"],
 ];
 
+const SAVE_INTERVAL = 2000; // every 2 seconds
+
 function TextEditor() {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
   const { id: documentId } = useParams();
+
+  // establish socket connection
   useEffect(() => {
     const s = io("http://localhost:3500");
     setSocket(s);
@@ -32,6 +36,7 @@ function TextEditor() {
     };
   }, []);
 
+  // load document if exists
   useEffect(() => {
     if (socket == null || quill == null) return;
     socket.once("doc/load", (document) => {
@@ -40,6 +45,20 @@ function TextEditor() {
     });
     socket.emit("doc/get", documentId);
   }, [socket, quill, documentId]);
+
+  // autosave
+  useEffect(() => {
+    if (socket == null || quill == null) return;
+
+    const interval = setInterval(() => {
+      socket.emit("autosave", quill.getContents());
+    }, SAVE_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [socket, quill]);
+
   // quill delta push
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -85,7 +104,7 @@ function TextEditor() {
 
     // disable while loading
     q.disable();
-    q.setText("loading...");
+    q.setText("Connecting...");
     setQuill(q);
   }, []);
   return <div className="text-editor" ref={editorRef}></div>;

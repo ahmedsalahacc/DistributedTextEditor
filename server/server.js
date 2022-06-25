@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
@@ -12,11 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb://localhost/distributed-text-editor", {
+mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
 });
 
 const server = http.createServer(app);
