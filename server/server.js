@@ -16,6 +16,7 @@ app.use(cors());
 
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 const server = http.createServer(app);
@@ -31,7 +32,12 @@ app.get("/", (req, res, next) => {
   });
 });
 
+// routes middlewares
+const nbookRoutes = require("./routes/notebook");
+
 // listen
+let db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection Error: "));
 
 const port = process.env.PORT || 3500;
 server.listen(port, () => {

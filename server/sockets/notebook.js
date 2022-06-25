@@ -1,6 +1,21 @@
 const io = require("socket.io");
 const { findOrCreate, findAndUpdate } = require("../models/notebook");
 
+const usersTracker = {
+  checkIfExists: function (id) {
+    return !(this[id] == null);
+  },
+
+  checkIfIdexistsAndAdd: function (id) {
+    if (this.checkIfExists(id)) this[id]++;
+    else this[id] = 1;
+  },
+  checkIfIdexistsAndDecrement: function (id) {
+    if (this.checkIfExists(id) && this[id] > 0) this[id]--;
+    if (this[id] == 0) delete this[id];
+  },
+};
+
 exports.sio = (server) => {
   return io(server, {
     transport: ["polling"],
@@ -14,12 +29,12 @@ exports.connection = (io) => {
   io.on("connection", (socket) => {
     console.log("client connected");
 
-    socket.on("disconnect", () => {
-      console.log("disconnected");
-    });
-
     socket.on("doc/get", async (id) => {
       const doc = await findOrCreate(id);
+      usersTracker.checkIfIdexistsAndAdd(id);
+      socket.broadcast.to(id).emit("n-users", usersTracker[id]);
+      console.log(usersTracker);
+
       socket.join(id);
       socket.emit("doc/load", doc.data);
 
@@ -30,6 +45,14 @@ exports.connection = (io) => {
 
       socket.on("autosave", async (data) => {
         await findAndUpdate(id, data);
+        socket.broadcast.to(id).emit("n-users", usersTracker[id]);
+      });
+
+      socket.on("disconnect", () => {
+        usersTracker.checkIfIdexistsAndDecrement(id);
+        console.log(usersTracker);
+        console.log("disconnected");
+        socket.broadcast.to(id).emit("n-users", usersTracker[id]);
       });
     });
   });

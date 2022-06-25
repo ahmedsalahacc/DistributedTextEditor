@@ -4,27 +4,34 @@ import Quill from "quill";
 import { io } from "socket.io-client";
 
 import "quill/dist/quill.snow.css";
-import "../styles.css/editor.css";
+import "../styles/editor.css";
 
 const TOOLBAR_OPTIONS = [
-  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  [{ font: [] }],
-  [{ list: "ordered" }, { list: "bullet" }],
-  ["bold", "italic", "underline", "strike"],
-  [{ color: [] }, { background: [] }],
-  [{ script: "sub" }, { script: "super" }],
-  [{ align: [] }],
-  ["image", "blockquote", "code-block"],
-  ["clean"],
+  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+  ['blockquote', 'code-block'],
+
+  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+  [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+  [{ 'direction': 'rtl' }],                         // text direction
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+  [{ 'font': [] }],
+
+  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+  [{ 'align': [] }],
+
+  ['clean'],                                         // remove formatting button
+  ['omega']
 ];
 
 const SAVE_INTERVAL = 2000; // every 2 seconds
 
-function TextEditor() {
+function Notebook() {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
+  const [nUsers, setNUsers] = useState(1)
   const { id: documentId } = useParams();
-
+  
   // establish socket connection
   useEffect(() => {
     const s = io("http://localhost:3500");
@@ -35,6 +42,19 @@ function TextEditor() {
       s.disconnect();
     };
   }, []);
+
+  // load number of users
+  useEffect(()=>{
+    if (socket == null || quill == null) return;
+    function handler(n){
+      setNUsers(n)
+    }
+    socket.on('n-users', handler)
+
+    return () => {
+      socket.off('n-users', handler)
+    };
+  },[socket, quill])
 
   // load document if exists
   useEffect(() => {
@@ -65,7 +85,7 @@ function TextEditor() {
 
     const deltaPushHandler = (delta, oldDelta, source) => {
       if (source !== "user") return;
-      console.log(delta);
+
       socket.emit("delta/push", delta);
     };
     quill.on("text-change", deltaPushHandler);
@@ -96,9 +116,11 @@ function TextEditor() {
     wrapper.innerHTML = "";
     // code
     const editor = document.createElement("div");
+    
     wrapper.append(editor);
     const q = new Quill(editor, {
       theme: "snow",
+      // modules: { toolbar: '' },
       modules: { toolbar: TOOLBAR_OPTIONS },
     });
 
@@ -106,8 +128,19 @@ function TextEditor() {
     q.disable();
     q.setText("Connecting...");
     setQuill(q);
+    
   }, []);
-  return <div className="text-editor" ref={editorRef}></div>;
+
+
+  return (
+    <div className="master">
+    <span className="users-label"><strong>{nUsers}</strong> user(s) connected</span>
+    <div className="parent-container">
+    <canvas className="draw-canvas" style={{zIndex:1000, }}></canvas>
+    <div className="text-editor" ref={editorRef} style={{zIndex: 0}}></div>
+    </div>
+  </div>
+    );
 }
 
-export default TextEditor;
+export default Notebook;
