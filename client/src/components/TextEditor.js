@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from "react";
+import { useParams } from "react-router-dom";
 import Quill from "quill";
 import { io } from "socket.io-client";
 
@@ -20,6 +21,7 @@ const TOOLBAR_OPTIONS = [
 function TextEditor() {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
+  const { id: documentId } = useParams();
   useEffect(() => {
     const s = io("http://localhost:3500");
     setSocket(s);
@@ -30,19 +32,41 @@ function TextEditor() {
     };
   }, []);
 
-  // quill change
+  useEffect(() => {
+    if (socket == null || quill == null) return;
+    socket.once("doc/load", (document) => {
+      quill.setContents(document);
+      quill.enable();
+    });
+    socket.emit("doc/get", documentId);
+  }, [socket, quill, documentId]);
+  // quill delta push
   useEffect(() => {
     if (socket == null || quill == null) return;
 
-    const deltaHandler = (delta, oldDelta, source) => {
+    const deltaPushHandler = (delta, oldDelta, source) => {
       if (source !== "user") return;
       console.log(delta);
-      socket.emit("send-changes", delta);
+      socket.emit("delta/push", delta);
     };
-    quill.on("text-change", deltaHandler);
+    quill.on("text-change", deltaPushHandler);
 
     return () => {
-      quill.off("text-change", deltaHandler);
+      quill.off("text-change", deltaPushHandler);
+    };
+  }, [socket, quill]);
+
+  // quill delta pull
+  useEffect(() => {
+    if (socket == null || quill == null) return;
+
+    const deltaPullHandler = (delta) => {
+      quill.updateContents(delta);
+    };
+    socket.on("delta/pull", deltaPullHandler);
+
+    return () => {
+      socket.off("delta/pull", deltaPullHandler);
     };
   }, [socket, quill]);
 
@@ -54,12 +78,15 @@ function TextEditor() {
     // code
     const editor = document.createElement("div");
     wrapper.append(editor);
-    setQuill(
-      new Quill(editor, {
-        theme: "snow",
-        modules: { toolbar: TOOLBAR_OPTIONS },
-      })
-    );
+    const q = new Quill(editor, {
+      theme: "snow",
+      modules: { toolbar: TOOLBAR_OPTIONS },
+    });
+
+    // disable while loading
+    q.disable();
+    q.setText("loading...");
+    setQuill(q);
   }, []);
   return <div className="text-editor" ref={editorRef}></div>;
 }
