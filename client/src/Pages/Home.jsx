@@ -1,6 +1,12 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD:client/src/Pages/Home.jsx
 
+=======
+import Notebook from './Notebook';
+
+// import '../styles/Home.css'; 
+>>>>>>> 2431f5db496d15639c6fc71eed5f3b3b7cd09b52:frontend/src/pages/Home.jsx
 import '../styles/Home.css'
 
 function Home() {
