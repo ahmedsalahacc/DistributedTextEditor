@@ -33,7 +33,6 @@ exports.connection = (io) => {
       const doc = await findOrCreate(id);
       usersTracker.checkIfIdexistsAndAdd(id);
       socket.broadcast.to(id).emit("n-users", usersTracker[id]);
-      console.log(usersTracker);
 
       socket.join(id);
       socket.emit("doc/load", doc.data);
@@ -50,7 +49,6 @@ exports.connection = (io) => {
 
       socket.on("disconnect", () => {
         usersTracker.checkIfIdexistsAndDecrement(id);
-        console.log(usersTracker);
         console.log("disconnected");
         socket.broadcast.to(id).emit("n-users", usersTracker[id]);
       });

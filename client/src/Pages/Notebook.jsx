@@ -136,7 +136,7 @@ function Notebook() {
     <div className="master">
     <span className="users-label"><strong>{nUsers}</strong> user(s) connected</span>
     <div className="parent-container">
-    <canvas className="draw-canvas" style={{zIndex:1000, }}></canvas>
+    {/* <canvas className="draw-canvas" style={{zIndex:1000, }}></canvas> */}
     <div className="text-editor" ref={editorRef} style={{zIndex: 0}}></div>
     </div>
   </div>
