@@ -18,19 +18,19 @@ function Home() {
   }
 
   return (
-        <div>
+        <div class="contentContainer">
             <div className="topnav">
               <a href="/about">About Us</a>
             </div>
             <div id="ovr">
             <div >
-              <h1>Edit Shared Documents with Your Teammates</h1>
+              <h1 id="welcome-message">Welcome To BroDox</h1>
             </div>
             <div className="formdiv"> 
               <form>
-                <label>Notebook ID </label>
+                <label id="notebookLabel"><strong>Notebook ID</strong></label>
                 <input type="text" min="1" id="notebookID"></input>
-                <button type="submit" onClick={goToNotebook}>Open</button>
+                <button class="btn-opn" type="submit" onClick={goToNotebook}>Open Notebook</button>
               </form>
             </div>
           </div>

@@ -5,11 +5,6 @@
     /*to account to all border and padding inside the css*/
 }
 
-/* body {
-    background-image: url(../images/lightbulb.jpg);
-    background-repeat: no-repeat;
-    background-size: cover;
-} */
 
 .topnav {
     overflow: hidden;
@@ -54,11 +49,52 @@ button {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     transform: translateX(-1px);
+
+    width:100px;
+    height:50px;
 }
 
 input {
     width: 300px;
+    height:50px;
     border-radius: 5px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
+}
+
+.btn-opn
+{
+    width: 200px;
+    height:50px;
+    font-weight: bold;
+}
+.btn-opn:hover
+{
+    cursor: pointer;
+    transform: scale(1.1);
+    filter: brightness(110%);
+}
+
+.btn-opn:active
+{
+    transform: translate(0px, 5px);
+    -webkit-transform: translate(0px, 5px);
+    box-shadow: 0px 1px 0px 0px;
+}
+.contentContainer
+{
+    height:100vh;
+    background-image:url("../../public/paintBackground.webp");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#welcome-message
+{
+    font-size: 250%;
+}
+
+#notebookLabel
+{
+    font-size: 150%;
 }

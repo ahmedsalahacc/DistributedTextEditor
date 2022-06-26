@@ -9,7 +9,7 @@ function About() {
             </div>
         <div>
             <div className="container">
-          <h1>About Us</h1>
+          <h1>About BroDox</h1>
           <div>
             <p>
               This project is done by the four senior(1) students of the faculty
