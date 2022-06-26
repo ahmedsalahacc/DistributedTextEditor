@@ -10,11 +10,15 @@ function Home() {
   function goToNotebook()
   {
     let notebookID = document.getElementById("notebookID").value;
-    // console.log(notebookID);
-    
-    notebookID = CryptoJS.MD5(notebookID).toString()
-    let path = `/docs/${notebookID}`; 
-    navigate(path);
+    if (notebookID.length == 0)
+    {
+      alert("Enter A Valid ID");
+    }
+    else{
+      notebookID = CryptoJS.MD5(notebookID).toString()
+      let path = `/docs/${notebookID}`; 
+      navigate(path);
+    }
   }
 
   return (
