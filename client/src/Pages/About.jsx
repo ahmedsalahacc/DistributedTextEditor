@@ -4,11 +4,11 @@ import "../styles/About.css";
 function About() {
   return (
     <div>
-        <div class="topnav">
+        <div className="topnav">
               <a href="/">Home</a>
             </div>
         <div>
-            <div class="container">
+            <div className="container">
           <h1>About Us</h1>
           <div>
             <p>
@@ -26,25 +26,25 @@ function About() {
             <table>
               <tr>
                 <td>Ahmed Salah A.Maksoud</td>
-                <td class="shft">
+                <td className="shft">
                   <a href="mailto:18P9076@eng.asu.edu.eg">18P9076@eng.asu.edu.eg</a>
                 </td>
               </tr>
               <tr>
                 <td>Emad Mostafa Mohamed</td>
-                <td class="shft">
+                <td className="shft">
                   <a href="mailto:18P1003@eng.asu.edu.eg">18P1003@eng.asu.edu.eg</a>
                 </td>
               </tr>
               <tr>
                 <td>Yehia Mohamed Hesham</td>
-                <td class="shft">
+                <td className="shft">
                   <a href="mailto:1804493@eng.asu.edu.eg">1804493@eng.asu.edu.eg</a>
                 </td>
               </tr>
               <tr>
                 <td>Kareem Ayman Farouk</td>
-                <td class="shft">
+                <td className="shft">
                   <a href="mailto:18P6994@eng.asu.edu.eg">18P6994@eng.asu.edu.eg</a>
                 </td>
               </tr>
@@ -53,11 +53,11 @@ function About() {
           <div>
             <h3>Associate Links</h3>
             <span>
-              Find Our Source Code <span class="dcrt">@</span>
+              Find Our Source Code <span className="dcrt">@</span>
               <a href="https://github.com/ahmedsalahacc/DistributedTextEditor" target="_blank" rel="noreferrer">Source Code </a>
             </span>
             <br></br>
-            <span>Watch Our Demonstration Video <span class="dcrt">@</span><a href="https://youtube.com" target="_blank" rel="noreferrer">Youtube Channel</a>
+            <span>Watch Our Demonstration Video <span className="dcrt">@</span><a href="https://youtube.com" target="_blank" rel="noreferrer">Youtube Channel</a>
             </span>
             <br></br>
             <span>

@@ -2,7 +2,6 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import Quill from "quill";
 import { io } from "socket.io-client";
-
 import "quill/dist/quill.snow.css";
 import "../styles/editor.css";
 

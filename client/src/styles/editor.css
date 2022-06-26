@@ -7,6 +7,10 @@ body{
     margin:0
 }
 
+.master{
+    text-align: center;
+}
+
 .text-editor .ql-editor{
     width: 100%;
     min-height: 11in;
@@ -24,6 +28,7 @@ body{
 
 .text-editor .ql-toolbar.ql-snow{
     display: flex;
+    justify-content: center;
     position: sticky;
     top:0;
     z-index: 1;
@@ -32,6 +37,10 @@ body{
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.5);
 }
 
+
+.users-label{
+    font-size: 1.1rem;
+}
 
 @page{
     margin: 1in;

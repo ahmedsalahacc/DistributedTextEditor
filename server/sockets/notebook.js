@@ -1,4 +1,6 @@
 const io = require("socket.io");
+var crypto = require("crypto-js");
+
 const { findOrCreate, findAndUpdate } = require("../models/notebook");
 
 const usersTracker = {
@@ -30,6 +32,7 @@ exports.connection = (io) => {
     console.log("client connected");
 
     socket.on("doc/get", async (id) => {
+      id = crypto.MD5(id).toString();
       const doc = await findOrCreate(id);
       usersTracker.checkIfIdexistsAndAdd(id);
       socket.broadcast.to(id).emit("n-users", usersTracker[id]);
