@@ -2,6 +2,9 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import Quill from "quill";
 import { io } from "socket.io-client";
+
+
+import {DifferentialSynchronizationClient} from '../Utils/DifferentialSynchronization'
 import "quill/dist/quill.snow.css";
 import "../styles/editor.css";
 
@@ -25,12 +28,15 @@ const TOOLBAR_OPTIONS = [
 
 const SAVE_INTERVAL = 2000; // every 2 seconds
 
+
+
+
 function Notebook() {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
   const [nUsers, setNUsers] = useState(1)
   const { id: documentId } = useParams();
-  
+  const dsc = new DifferentialSynchronizationClient()
   // establish socket connection
   useEffect(() => {
     const s = io("http://localhost:3500");
@@ -44,6 +50,8 @@ function Notebook() {
 
   // load number of users
   useEffect(()=>{
+    console.log('onload users')
+
     if (socket == null || quill == null) return;
     function handler(n){
       setNUsers(n)
@@ -57,20 +65,32 @@ function Notebook() {
 
   // load document if exists
   useEffect(() => {
+    console.log('onload doc')
     if (socket == null || quill == null) return;
     socket.once("doc/load", (document) => {
-      quill.setContents(document);
+      console.log(document)
+      quill.setText(document);
+      dsc.initShadow(document)
       quill.enable();
     });
     socket.emit("doc/get", documentId);
   }, [socket, quill, documentId]);
 
+
   // autosave
   useEffect(() => {
+    console.log('on autosave')
     if (socket == null || quill == null) return;
 
     const interval = setInterval(() => {
-      socket.emit("autosave", quill.getContents());
+        quill.enable()
+        dsc.updateShadow(quill.getText())
+        socket.emit("autosave", quill.getText());
+      if(!socket.connected){
+        window.alert('Check your connection')
+        quill.setText("Trying to connect... check your connection.");
+        quill.disable()
+      }
     }, SAVE_INTERVAL);
 
     return () => {
@@ -80,12 +100,17 @@ function Notebook() {
 
   // quill delta push
   useEffect(() => {
+    console.log('delta push')
     if (socket == null || quill == null) return;
 
     const deltaPushHandler = (delta, oldDelta, source) => {
       if (source !== "user") return;
-
-      socket.emit("delta/push", delta);
+      const clientText = quill.getText()
+      console.log(clientText, typeof clientText)
+      const patches = dsc.getPatchesToMatchText(clientText)
+      console.log(patches)
+      dsc.updateShadow(clientText)
+      socket.emit("delta/push", patches);
     };
     quill.on("text-change", deltaPushHandler);
 
@@ -96,10 +121,20 @@ function Notebook() {
 
   // quill delta pull
   useEffect(() => {
+    console.log('on delta pull')
+
     if (socket == null || quill == null) return;
 
     const deltaPullHandler = (delta) => {
-      quill.updateContents(delta);
+      dsc.applyPatchesToShadow(delta)
+      const clientText = quill.getText()
+      console.log('delta', delta)
+      const newClientText = dsc.applyPatchesToText(delta, clientText)
+      quill.setText(newClientText)
+      // quill.updateContents(delta);
+      // const newPatches = dsc.getPatchesToMatchText(newClientText)
+      // dsc.updateShadow(newClientText)
+      // socket.emit("delta/push", newPatches);
     };
     socket.on("delta/pull", deltaPullHandler);
 
